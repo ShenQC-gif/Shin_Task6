@@ -11,25 +11,18 @@ class ViewController: UIViewController {
 
     @IBOutlet private weak var slider: UISlider!
     @IBOutlet private weak var numberLabel: UILabel!
-    private var sliderValue = Int()
+    private var correctAnswer = 0
+    private static let valueRange = 1...100
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        showRandomNumberUnderHundred()
-        sliderValue = Int(round(slider.value * 100))
-    }
-
-    @IBAction private func changeValue(_ sender: Any) {
-        sliderValue = Int(round(slider.value * 100))
-        if sliderValue == 0 {
-            sliderValue = 1
-        }
+        slider.minimumValue = Float(Self.valueRange.lowerBound)
+        slider.maximumValue = Float(Self.valueRange.upperBound)
+        resetGame()
     }
 
     @IBAction func didTapJudgeButton(_ sender: Any) {
-
-        let labelNumer = Int(numberLabel.text ?? "") ?? 0
-        if labelNumer == sliderValue {
+        if correctAnswer == Int(slider.value) {
             showResultAler(msg: "あたり")
         } else {
             showResultAler(msg: "はずれ")
@@ -37,10 +30,12 @@ class ViewController: UIViewController {
     }
 
     private func showResultAler(msg: String) {
-        let alert = UIAlertController(title: "結果", message: "\(msg)\nあなたの値:\(sliderValue)", preferredStyle: .alert)
+        let alert = UIAlertController(title: "結果",
+                                      message: "\(msg)\nあなたの値:\(Int(slider.value))",
+                                      preferredStyle: .alert)
 
-        let defalutAction = UIAlertAction(title: "再挑戦", style: .default) { _ in
-            self.showRandomNumberUnderHundred()
+        let defalutAction = UIAlertAction(title: "再挑戦", style: .default) {[weak self] _ in
+            self?.resetGame()
         }
         alert.addAction(defalutAction)
 
@@ -48,7 +43,8 @@ class ViewController: UIViewController {
 
     }
 
-    private func showRandomNumberUnderHundred() {
-        numberLabel.text = "\(Int(arc4random_uniform(101)))"
+    private func resetGame() {
+        correctAnswer =  Int.random(in: Self.valueRange)
+        numberLabel.text = "\(correctAnswer)"
     }
 }
